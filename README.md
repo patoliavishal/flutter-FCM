@@ -6,7 +6,7 @@ A Flutter sample app for demonstrating how to handle firebase push notifications
 
 Notification while the app is running in the **background** and handle navigation:
 
-![](graphics/foreground_notification.gif)
+![](graphics/background_notification.gif)
 
 Notification while the app is running in the **foreground** and handle navigation:
 
