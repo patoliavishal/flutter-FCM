@@ -17,6 +17,7 @@ late FirebaseMessaging messaging;
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   messaging = FirebaseMessaging.instance;
