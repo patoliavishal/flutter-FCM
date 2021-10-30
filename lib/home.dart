@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notification/main.dart';
 import 'package:flutter_notification/product.dart';
+import 'package:flutter_notification/product_details.dart';
 
 class HomePage extends StatefulWidget {
   final String? message;
@@ -17,13 +18,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   void initState() {
     super.initState();
 
     final android =
-    AndroidInitializationSettings('@drawable/ic_notifications_icon');
+        AndroidInitializationSettings('@drawable/ic_notifications_icon');
     final iOS = IOSInitializationSettings();
     final initSettings = InitializationSettings(android: android, iOS: iOS);
 
@@ -77,16 +77,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleMessage(Map<String, dynamic> data) {
-    if (data['type'] == "1") {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomePage(message: data['message'])));
-    } else if (data['type'] == "2") {
+    if (data['redirect'] == "product") {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => ProductPage(message: data['message'])));
+    } else if (data['redirect'] == "product_details") {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  ProductDetailsPage(message: data['message'])));
     }
   }
 
@@ -101,7 +102,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Notification Message For Home: \n ${widget.message}',
+              'You will receive notification',
             ),
           ],
         ),
