@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,17 +20,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
   void initState() {
     super.initState();
-
-    final android =
-        AndroidInitializationSettings('@drawable/ic_notifications_icon');
-    final iOS = IOSInitializationSettings();
-    final initSettings = InitializationSettings(android: android, iOS: iOS);
-
-    flutterLocalNotificationsPlugin!
-        .initialize(initSettings, onSelectNotification: onSelectNotification);
+    _configureDidReceiveLocalNotificationSubject();
 
     setupInteractedMessage();
 
@@ -47,7 +43,6 @@ class _HomePageState extends State<HomePage> {
               android: AndroidNotificationDetails(
                 channel!.id,
                 channel!.name,
-                channel!.description,
                 priority: Priority.high,
                 importance: Importance.max,
                 setAsGroupSummary: true,
@@ -63,6 +58,32 @@ class _HomePageState extends State<HomePage> {
     });
     FirebaseMessaging.onMessageOpenedApp
         .listen((message) => _handleMessage(message.data));
+  }
+
+  void _configureDidReceiveLocalNotificationSubject() {
+    didReceiveLocalNotificationStream.stream
+        .listen((ReceivedNotification receivedNotification) async {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: receivedNotification.title != null
+              ? Text(receivedNotification.title!)
+              : null,
+          content: receivedNotification.body != null
+              ? Text(receivedNotification.body!)
+              : null,
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () async {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              child: const Text('Ok'),
+            )
+          ],
+        ),
+      );
+    });
   }
 
   Future<dynamic> onSelectNotification(payload) async {
@@ -109,4 +130,18 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+class ReceivedNotification {
+  ReceivedNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.payload,
+  });
+
+  final int id;
+  final String? title;
+  final String? body;
+  final String? payload;
 }

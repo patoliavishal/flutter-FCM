@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +18,24 @@ late FirebaseMessaging messaging;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
+final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
+StreamController<ReceivedNotification>.broadcast();
+
+final StreamController<String?> selectNotificationStream =
+StreamController<String?>.broadcast();
+
+const String navigationActionId = 'id_3';
+
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  print('notification(${notificationResponse.id}) action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
+  if (notificationResponse.input?.isNotEmpty ?? false) {
+    print(
+        'notification action tapped with input: ${notificationResponse.input}');
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -30,7 +50,6 @@ Future<void> main() async {
     channel = const AndroidNotificationChannel(
         'flutter_notification', // id
         'flutter_notification_title', // title
-        'flutter_notification_description', // description
         importance: Importance.high,
         enableLights: true,
         enableVibration: true,
@@ -38,10 +57,26 @@ Future<void> main() async {
         playSound: true);
 
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    await flutterLocalNotificationsPlugin!
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel!);
+
+    final android =
+    AndroidInitializationSettings('@drawable/ic_notifications_icon');
+    final iOS = DarwinInitializationSettings();
+    final initSettings = InitializationSettings(android: android, iOS: iOS);
+
+    await flutterLocalNotificationsPlugin!.initialize(initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
+          switch (notificationResponse.notificationResponseType) {
+            case NotificationResponseType.selectedNotification:
+              selectNotificationStream.add(notificationResponse.payload);
+              break;
+            case NotificationResponseType.selectedNotificationAction:
+              if (notificationResponse.actionId == navigationActionId) {
+                selectNotificationStream.add(notificationResponse.payload);
+              }
+              break;
+          }
+        },
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
