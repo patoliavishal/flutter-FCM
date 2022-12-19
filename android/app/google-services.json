@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1073921984354:android:685f9157b7cfcd6c1c0e3b",
         "android_client_info": {
-          "package_name": "com.vsp.flutter_notification"
+          "package_name": "com.test.flutter_notification"
         }
       },
       "oauth_client": [

@@ -55,6 +55,7 @@ class _HomePageState extends State<HomePage> {
             ),
             payload: action);
       }
+      print('A new event was published!');
     });
     FirebaseMessaging.onMessageOpenedApp
         .listen((message) => _handleMessage(message.data));
