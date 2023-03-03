@@ -2,13 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notification/main.dart';
 import 'package:flutter_notification/product.dart';
-import 'package:flutter_notification/product_details.dart';
 
 class HomePage extends StatefulWidget {
   final String? message;
@@ -20,13 +18,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   void initState() {
     super.initState();
-    _configureDidReceiveLocalNotificationSubject();
 
     setupInteractedMessage();
+
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) async {
+      RemoteNotification? notification = message?.notification!;
+
+      print(notification != null ? notification.title : '');
+    });
 
     FirebaseMessaging.onMessage.listen((message) async {
       RemoteNotification? notification = message.notification;
@@ -57,34 +61,9 @@ class _HomePageState extends State<HomePage> {
       }
       print('A new event was published!');
     });
+
     FirebaseMessaging.onMessageOpenedApp
         .listen((message) => _handleMessage(message.data));
-  }
-
-  void _configureDidReceiveLocalNotificationSubject() {
-    didReceiveLocalNotificationStream.stream
-        .listen((ReceivedNotification receivedNotification) async {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: receivedNotification.title != null
-              ? Text(receivedNotification.title!)
-              : null,
-          content: receivedNotification.body != null
-              ? Text(receivedNotification.body!)
-              : null,
-          actions: <Widget>[
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () async {
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-              child: const Text('Ok'),
-            )
-          ],
-        ),
-      );
-    });
   }
 
   Future<dynamic> onSelectNotification(payload) async {
@@ -104,12 +83,6 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
               builder: (context) => ProductPage(message: data['message'])));
-    } else if (data['redirect'] == "product_details") {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  ProductDetailsPage(message: data['message'])));
     }
   }
 
@@ -131,18 +104,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-class ReceivedNotification {
-  ReceivedNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.payload,
-  });
-
-  final int id;
-  final String? title;
-  final String? body;
-  final String? payload;
 }

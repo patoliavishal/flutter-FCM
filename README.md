@@ -43,19 +43,30 @@ In order to run this project, you have to follow the steps below:
 
 2. Complete Firebase project setup for both **Android** & **iOS** platforms by going to the [Firebase console](https://console.firebase.google.com/).
 
-3. For running on **iOS**, you have to do some configurations from Xcode. Follow the guide [here](https://firebase.flutter.dev/docs/messaging/apple-integration).
+3. For Android, replace your google-services.json file with an existing file. 
 
-4. Get Flutter packages:
+   ```bash
+   android -> app -> google-services.json
+   ```
+
+4. For running on **iOS**, you have to do some configurations from Xcode. Follow the guide [here](https://firebase.flutter.dev/docs/messaging/apple-integration).
+
+5. Get Flutter packages:
 
    ```bash
    flutter pub get
    ```
 
-5. Run the app:
+6. Run the app:
 
    ```bash
    flutter run
    ```
+   
+
+**_NOTE:_**
+ :warning: I have only tested this on an Android device.
+
 
 **If my example really helpful to you then please don't forgot to press **`Star`** icon.**
 
@@ -84,7 +95,8 @@ In order to run this project, you have to follow the steps below:
         "to": "/topics/flutter-notification",
         "notification": {
           "body": "Test Push Notification",
-          "title": "Push Notification"
+          "title": "Push Notification",
+          "redirect": "product"
         },
         "data": {
           "title": "Push Notification",
@@ -98,7 +110,7 @@ Refer [http-server-ref](https://firebase.google.com/docs/cloud-messaging/http-se
 
 # License
 ```license
-Copyright (c) 2021 Vishal Patolia
+Copyright (c) 2023 Vishal Patolia
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -18,13 +17,6 @@ late FirebaseMessaging messaging;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
-final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-    StreamController<ReceivedNotification>.broadcast();
-
-final StreamController<String?> selectNotificationStream =
-    StreamController<String?>.broadcast();
-
-
 void notificationTapBackground(NotificationResponse notificationResponse) {
   print('notification(${notificationResponse.id}) action tapped: '
       '${notificationResponse.actionId} with'
@@ -41,17 +33,7 @@ Future<void> main() async {
 
   messaging = FirebaseMessaging.instance;
 
-  //If subscribe based sent notification then use this token
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  print(fcmToken);
-
-  //If subscribe based on topic then use this
-  await FirebaseMessaging.instance.subscribeToTopic('flutter_notification');
-
-  // Set the background messaging handler early on, as a named top-level function
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  NotificationSettings settings = await messaging.requestPermission(
+  await messaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -61,7 +43,15 @@ Future<void> main() async {
     sound: true,
   );
 
-  print('User granted permission: ${settings.authorizationStatus}');
+  //If subscribe based sent notification then use this token
+  final fcmToken = await messaging.getToken();
+  print(fcmToken);
+
+  //If subscribe based on topic then use this
+  await messaging.subscribeToTopic('flutter_notification');
+
+  // Set the background messaging handler early on, as a named top-level function
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   if (!kIsWeb) {
     channel = const AndroidNotificationChannel(
@@ -81,12 +71,10 @@ Future<void> main() async {
     final initSettings = InitializationSettings(android: android, iOS: iOS);
 
     await flutterLocalNotificationsPlugin!.initialize(initSettings,
-        onDidReceiveNotificationResponse:
-            (NotificationResponse notificationResponse) {
-      selectNotificationStream.add(notificationResponse.payload);
-    }, onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
+        onDidReceiveNotificationResponse: notificationTapBackground,
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 
-    await FirebaseMessaging.instance
+    await messaging
         .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
