@@ -26,10 +26,10 @@ Add the following to your `pubspec.yaml` file:
 
 ```yaml
   cupertino_icons: ^1.0.2
-  firebase_messaging: ^10.0.4
+  firebase_messaging: ^14.2.5
   firebase_analytics: ^8.0.2
-  flutter_local_notifications: ^8.1.1+1
-  firebase_core: ^1.4.0
+  flutter_local_notifications: ^13.0.0
+  firebase_core: ^2.7.0
 ```
 ## Usage
 
@@ -65,7 +65,7 @@ In order to run this project, you have to follow the steps below:
    
 
 **_NOTE:_**
- :warning: I have only tested this on an Android device.
+ :warning: I have only tested this on Android devices, not on iOS devices.
 
 
 **If my example really helpful to you then please don't forgot to press **`Star`** icon.**
