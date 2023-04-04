@@ -64,10 +64,6 @@ In order to run this project, you have to follow the steps below:
    ```
    
 
-**_NOTE:_**
- :warning: I have only tested this on Android devices, not on iOS devices.
-
-
 **If my example really helpful to you then please don't forgot to press **`Star`** icon.**
 
 
